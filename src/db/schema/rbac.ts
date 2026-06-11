@@ -1,5 +1,6 @@
 import { pgTable, text, boolean, timestamp, unique } from "drizzle-orm/pg-core";
-import { loaction, tenant, tenantUser } from "./tenancy";
+// import {  tenant, tenantUser } from "./tenancy";
+import { location, tenant, tenantUser } from "./tenancy";
 import { relations } from "drizzle-orm";
 
 export const module = pgTable("module", {
@@ -58,7 +59,7 @@ export const userRole = pgTable("user_role", {
   roleId: text("role_id")
     .notNull()
     .references(() => role.id, { onDelete: "cascade" }),
-  locationId: text("location_id").references(() => loaction.id, {
+  locationId: text("location_id").references(() => location.id, {
     onDelete: "cascade",
   }), // null = all locations
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -86,9 +87,9 @@ export const userRoleRelations = relations(userRole, ({ one }) => ({
     references: [tenantUser.id],
   }),
   role: one(role, { fields: [userRole.roleId], references: [role.id] }),
-  location: one(loaction, {
+  location: one(location, {
     fields: [userRole.locationId],
-    references: [loaction.id],
+    references: [location.id],
   }),
 }));
 

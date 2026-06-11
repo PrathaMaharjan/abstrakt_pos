@@ -7,7 +7,7 @@
 import { eq } from "drizzle-orm";
 import { db } from ".";
 import { permission, role, rolePermission } from "./schema/rbac";
-import { loaction, tenant } from "./schema/tenancy";
+import { location, tenant } from "./schema/tenancy";
 import { subscription } from "./schema/billing";
 import { createId } from "@paralleldrive/cuid2";
 
@@ -170,7 +170,7 @@ export async function createFirstLocation(input: {
   phone?: string;
 }) {
   const [newLocation] = await db
-    .insert(loaction)
+    .insert(location)
     .values({
       id: createId(),
       tenantId: input.tenantId,

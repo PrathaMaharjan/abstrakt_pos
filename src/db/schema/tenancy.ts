@@ -1,6 +1,6 @@
 import { pgTable, text, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
-import { user } from "./auth";
 import { relations } from "drizzle-orm";
+
 export const tenantStatusEnum = pgEnum("tenant_status", [
   "ACTIVE",
   "SUSPENDED",
@@ -15,20 +15,20 @@ export const platformRoleEnum = pgEnum("platform_role", [
 
 export const tenant = pgTable("tenant", {
   id: text("id").primaryKey(),
-  name: text("text").notNull(),
+  name: text("name").notNull(), // fixed: was text("text")
   slug: text("slug").notNull().unique(),
   logoUrl: text("logo_url"),
   status: tenantStatusEnum("status").notNull().default("ACTIVE"),
   stripeCustomerId: text("stripe_customer_id"),
-  created_at: timestamp("created_at", { withTimezone: true })
+  createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });
 
-export const loaction = pgTable("location", {
+export const location = pgTable("location", {
   id: text("id").primaryKey(),
   tenantId: text("tenant_id")
     .notNull()
@@ -40,9 +40,9 @@ export const loaction = pgTable("location", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-  updateAt: timestamp("created_at", { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow(), // fixed: was "created_at"
 });
 
 export const tenantUser = pgTable("tenant_user", {
@@ -73,12 +73,12 @@ export const platfrom_User = pgTable("platfrom_user", {
 });
 
 export const tenantRelations = relations(tenant, ({ many }) => ({
-  loactions: many(loaction),
-  tenantUser: many(tenantUser),
+  locations: many(location),
+  tenantUsers: many(tenantUser),
 }));
 
-export const locationRelations = relations(loaction, ({ one }) => ({
-  tenant: one(tenant, { fields: [loaction.tenantId], references: [tenant.id] }),
+export const locationRelations = relations(location, ({ one }) => ({
+  tenant: one(tenant, { fields: [location.tenantId], references: [tenant.id] }),
 }));
 
 export const tenantUserRelations = relations(tenantUser, ({ one }) => ({
@@ -88,10 +88,10 @@ export const tenantUserRelations = relations(tenantUser, ({ one }) => ({
   }),
 }));
 
-export type Tenant = typeof tenant.$inferInsert;
+export type Tenant = typeof tenant.$inferSelect;
 export type NewTenant = typeof tenant.$inferInsert;
 export type Location = typeof location.$inferSelect;
 export type NewLocation = typeof location.$inferInsert;
 export type TenantUser = typeof tenantUser.$inferSelect;
 export type NewTenantUser = typeof tenantUser.$inferInsert;
-export type PlatformUser = typeof platformUser.$inferSelect;
+export type PlatformUser = typeof platfrom_User.$inferSelect;
