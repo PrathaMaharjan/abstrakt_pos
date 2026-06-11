@@ -1,6 +1,17 @@
+import { checkDbHealth } from "@/db";
 import Image from "next/image";
 
 export default function Home() {
+  const result = checkDbHealth();
+  result.then((res) => {
+    if (res.healthy) {
+      console.log(`Connected — ${res.latencyMs}ms`);
+    } else {
+      console.error(`Not connected — ${res.error}`);
+      process.exit(1);
+    }
+  });
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
